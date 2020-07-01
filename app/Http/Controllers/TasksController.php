@@ -46,11 +46,12 @@ class TasksController extends Controller
             'content' => 'required|max:255',
         ]);
         
-        $request->user()->tasks()->create([
-            'status' => $request->status,
-            'content' => $request->content,
-        ]);
-        
+        if (\Auth::check()) {
+            $request->user()->tasks()->create([
+                'status' => $request->status,
+                'content' => $request->content,
+            ]);
+        }
         return redirect('/');
     }
 
@@ -87,10 +88,11 @@ class TasksController extends Controller
         ]);
         
         $task =Task::findOrFail($id);
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
-        
+        if (\Auth::id() === $task->user_id) {
+            $task->status = $request->status;
+            $task->content = $request->content;
+            $task->save();
+        }
         return redirect('/');
     }
 
